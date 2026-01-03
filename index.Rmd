@@ -1,0 +1,223 @@
+---
+title: An R Markdown document converted from "Copy_of_Applying_Fun_R.ipynb"
+output: html_document
+---
+
+<a href="https://colab.research.google.com/github/nkinsman16/HW-Week-2--Applying-Functions/blob/main/Copy_of_Applying_Fun_R.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
+# Applying functions in R
+
+Installing to tead Excel files:
+
+```{r}
+#Installs the package "rio". Rio comes from the CRAN or the (Comprehensive R Archive Network). The install.packages() allows us to download the package along with any required dependencies and makes it available for use in the R environment.
+#"RIO" is an R Package designed to make importing and exporting data simple and consistent. Its main goal is to let you read and write many different file formats using just one or two functions, without having to rememeber format specific commands.
+#install.packages('rio')
+```
+
+# reading data
+
+```{r}
+# opening a file from a url (file in Excel), name it 'fragility23.
+#LinkGit is a variable that stores the web address of an Excel file hosted on Github. By itself it doesn't perform any action, it just simply saves the link as text so it can be used later.
+linkGit<- "https://github.com/nkinsman16/HW-Week-2--Applying-Functions/raw/refs/heads/main/FSI-2023-DOWNLOAD.xlsx"
+
+#Loads the rio package so its functions are available in the current R session. It allows you to use functions like import() and export() without needing to reinstall the package.
+library(rio) # package needed
+#This uses the import() function that we had downloaded from the rio library. The file stored in the linkGit will automatically take the link and use the data within to import it's contents into the R assignment.
+fragility23<-rio::import(file = linkGit) #object that will hold the result
+```
+
+```{r}
+#Calls the str() or structure, it's purpose is to display a compact summary of the internal structure of the object fragility23. It shows information such as the object's type, number of rows and columns, variable names, data types and preview of values.
+#Thus we can quickly understand what type of data is located within.
+#Prints the structure of the data frame
+str(fragility23)
+```
+
+## Apply square root function?
+
+```{r}
+#The sqrt function is trying to compute the square root of every element in this data frame fragility23. This will only work if everything within fragility234 are numerical values. Otherwise if the sqrt is calculating non numeric objects then it will return an error.
+#within Collab I am able to see the error, however in RStudio I am unable to run the whole line without issue.
+# whole DF?
+#sqrt(fragility23)
+```
+
+```{r}
+#Here is a great example of how to use the sqrt() object with the data. Here we've selected columns 4 and 5 of the fragility data frame.
+#By subsetting with [,4:5] I am restricting the operation to two columns, which are numeric. Thus I can square root these columns without issue
+# several columns (only numerical)
+
+sqrt(fragility23[,4:5])
+```
+
+```{r}
+
+#Apples the sqrt() function to the Total column within the fragility23 data frame. It calculates the square root of each numeric value in that variable and returns the transformed values, which can be useful.
+#the $ operator is used to access specific variables (columns) inside the object. When writing fragility23$ then you are saying work directly with the following column.
+# one column
+sqrt(fragility23$Total)
+```
+
+```{r}
+#sqrt() is the mathematical function to calculate the square root of a numeric value.
+#We are again selecting the one column in fragility23 'Total' as using the $ allows us to select the specific column.
+#The square brackets are usign for indexing and the '1' specifically selects the first element of a vector or in this case it extracts the first row of the column.
+# one value
+sqrt(fragility23$Total[1])
+```
+
+## Applying **sum()**:
+
+```{r}
+#sum() is the R function that calculates the total by adding together numeric values. When applied tgo an object it attempts to add all of the elements into a single number.
+#We are using the datafram fragility23 and it's columns 4 and 5. Thus it selects all the rows from columns 4 and 5 and adds all the values up across both columns to return a signel value.
+# sum everything
+sum(fragility23[,4:5])
+```
+
+```{r}
+#Apply() is a function used to apply another function across rows/columns of a dataframne (fragility23).In this case we are again selecting columns 4 and 5 from fragility23.
+#The '2' tells the apply to operate by columns, whereas the 1 would be used for rows. Thus this function is asking for the sum of the two columns.
+#Sum is the function where all values are added together to give one single total
+# This is asking for the sum of columns 4 and 5 separately and printing both outputs of the columns.
+# sum by column
+print(apply(fragility23[,4:5],2,sum))
+```
+
+```{r}
+#apply(fragility23[,4:5],2,sum) applies the sum() function of each of the columns 4 and 5 of the fragility23 data frame, returning the totals of each column.
+#typeof() is a R function that reports the underlying data type of an object (such as double, integer, character or list)
+#This expression is reporting the data type of the result produced by apply(). Thus the result is 'double' because both columns are numeric values.
+#notice
+typeof(apply(fragility23[,4:5],2,sum))
+```
+
+If you do not see **list**, then it is a vector. ⏫
+
+```{r}
+#We are again taking the columns of fragility23 BUT we are operating the sum function by the rows and NOT the columns. This is shown by the 1 instead of the 2 within the equation.
+#We are still applying the sum function and then printing it, which forces the result to be displayed in the console.
+#within the console you will see that each number represents a row wise total. On the top of each total you can see the number of the row, whereas on the bottom you see the sum.
+#For example 97/70.7 means that for row 97 the sum is 70.7.
+# sum by row
+print(apply(fragility23[,4:5],1,sum))
+```
+
+### Apply by iterating:
+
+```{r}
+#Takes columns 4 and 5 from fragility23, applies the sum function and prints the list
+#lapply: applies a function to each column of a data frame and always returns the result as a list. The difference with apply() and lapply() is that lapply() never simplifies, it will always returns a list; each column's sum becomes it's own list element
+#apply() prints like a row because it's a vector whereas lapply prints vertically because it's a list. You'd want to use a list if there are many different types of objects
+print(lapply(fragility23[,4:5],sum))
+```
+
+Notice output of **lapply**:
+
+```{r}
+
+#Always returns a list because of lapply, typeof() Tells the low-level storage type, it tells how R internally stores the object in memory.
+#Thus because it is a lapply and we know that lapply creates a list of each of the columns 4 and 5 from fragility23 then we know it will be a list.
+#This demonstrates that lapply() will return a list even with numeric totals.
+typeof(lapply(fragility23[,4:5],sum))
+```
+
+```{r}
+#Always returns a list because of lapply, class() tells how R treats the object, for example as a list, data frame or numeric vector. This is different from typeof() which only reports the low level storage change where class shos the high level.
+#Thus we have a list of the sum of two columns, and class confirms that they are still copnsidered lists.
+class(lapply(fragility23[,4:5],sum))
+```
+
+Notice output of **sapply**:
+
+```{r}
+#sapply applies a function to each selected column and simplifies the result to a vector. Vectors sotores many values of the same type, such as numbers.This is different from lists which store manyh different types of objects at the same time.
+# Takes columns 4 and 5 from fragility23, applies sum() to each column and returns and prints
+print(sapply(fragility23[,4:5],sum))
+```
+
+```{r}
+#sapply() attempts to simplify the result to a vector. Thus when the class() reports the high level object it will assign it to a numeric value as all the columns are numeric and only have one type of object.
+#This is very importanty because it allows us to have a numeric vector which works with plotting and modeling functions.
+
+class(sapply(fragility23[,4:5],sum))
+```
+
+Similarly:
+
+```{r}
+#Applies the function sqrt() to each column and prints out the results as a list, with one list element per column.
+#:The print() function then displays this list and preserves the original column structure.
+#In the outputg, you can see each row starts with a number, this number is the row number. Thus if we see [8] the first object in that row is for row 8.
+print(lapply(fragility23[,4:5],sqrt))
+```
+
+```{r}
+#This tells us what the class() or the high level object class of the result of lapply().
+#This equation is just creating a list of the sqrt() or columns 4 and 5 from the fragility23 data frame.
+#High level class tells us how the object will be used within R.
+class(lapply(fragility23[,4:5],sqrt))
+```
+
+```{r}
+#This applies the sqrt() function to columns 4 and 5 from the dataframe fragility23 and the sapply is making them into vectors.
+#It prints all this into vectors and you see the outcome of it for the two columns. In addition you see the row indices which are matrix row labels.
+print(sapply(fragility23[,4:5],sqrt))
+```
+
+```{r}
+#This is calculating the sqrt() of columns 4 and 5 of the fragility23 dataframe. We are usign sapply to turn the values into vectors and into a matrix.
+#When we are asking for the class we are asking for the high level object class of the result produced by sapply(). This outcome is what we saw in our previous cell.
+#A matrix is a two dimensional data structure using the same data type and array is a multi dimensional generalization of a matrix that can have two or more dimensions, with all elements of the same data type.
+class(sapply(fragility23[,4:5],sqrt))
+```
+
+Now our own function:
+
+#Within Collab
+
+```{r}
+#Defining the function named 'theOnesOK'
+theOnesOK = function(DF_country_and_variable) {
+  #Extract the column Specified by the DF Variable from the data frame
+  variable_values <- DF_country_and_variable[,2]
+  #Calculate the average fo the variable selected and removing missing values
+  avg_value <- mean(variable_values, na.rm = TRUE)
+  #Compares each value to the average and assigns a label
+  is_above <- ifelse(variable_values > avg_value, "Above Average", "Below/At Average") # The condition being met. If the label is True then "Above Average", if it's False "Below/At Average"
+  DF_country_and_variable$Status <- is_above #Creattes a new column called 'Status' and filters for those values that equal to "Above Average"
+  return(DF_country_and_variable)#Returns the rest of the values that don't meet the Status Condition
+}
+```
+
+```{r}
+theOnesOK(fragility23[,c('Country','S1: Demographic Pressures')])
+```
+
+```{r}
+#Define the function named mystery: DF: a data frame containing data
+#positionsToUse: Which columns of DF you want to average
+#CountryColumn=Country: recalling Country variable with CountryColumn
+mystery=function(DF,positionsToUse,CountryColumn='Country'){
+  #The new variable newDF, selects the new Column 'CountryColumn' and drop=FALSE forces the result to stay a data frame
+  newDF=DF[,c(CountryColumn),drop = FALSE]
+  #Creates a new variable that stores the string 'average'
+  average='average'
+  #Takes only the columns you want to average,  "1": apply across rows, "mean": computes the mean of each row, "na.rm" means ignore NA values when computing the mean
+  newDF[,average]=apply(DF[,positionsToUse],1,mean,na.rm = TRUE)
+  #Returns a data frame containing only the country column and the "average" column
+  return(newDF[,c(CountryColumn,average)])
+}
+```
+
+```{r}
+#Putting the function in action
+mystery(
+  fragility23[, c("Country", "Total", "S1: Demographic Pressures", "S2: Refugees and IDPs")],#Takes the Country Text as one column, then the other columns "Total", "S1: Demographic Pressures", "S2: Refugees and IDPs"" will be used as the average
+  positionsToUse = 2:4,#Columns to use for averaging
+  CountryColumn = "Country"#Tells the function which column has the country names
+)
+```
+
